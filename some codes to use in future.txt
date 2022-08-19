@@ -1,0 +1,24 @@
+
+login code by tj
+---------------------------------------------------------------------------------------
+router.post('/login',async (req,res)=>{
+
+ if(!req.body.email || !req.body.password) return res.status(400).json({err: "insufficient parameter"})
+  // get id and password
+  let email = req.body.email;
+  // console.log("email", email);
+  let password = '';
+  // encrypt password
+  bcrypt.hash(req.body.password,10,(err,hash)=>{
+    if(err) return res.status(500).json(err);
+    this.password = hash;
+    // console.log("password", this.password);
+  })
+  // fetch user from mongodb with id
+  let reqUser = await registration.find({email: email});
+
+  // console.log("reqUser", this.reqUser);
+  // match password, return success if matched otherwise failed
+  if(reqUser.password == this.password) return res.status(200).json(reqUser);
+  else return res.status(401).json({err: "Password is invalid"});
+});
