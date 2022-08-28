@@ -1,13 +1,15 @@
 const jwt = require('jsonwebtoken');
 
-
-module.exports=(req,res,next)=>{
+async function checkAuth(req,res,next){
    try{
-    const token=req.headers.authorization.split(' ')[1];
-   const decode = jwt.verify(token,"webBatch")
-   req.userData=decode
+   const token= await req.headers.authorization//.split(".")[1];
+   console.log(token);
+   jwt.verify(token,"webBatch")
    next();
+   
    }catch(error){
-    res.json({success:false,message:"Authentication Failed"})
+    res.json({success:false,message:"Authentication Failed in CheakAuth"})
    }
 }
+
+module.exports= checkAuth; 

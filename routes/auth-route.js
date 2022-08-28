@@ -2,18 +2,19 @@ const bcrypt = require('bcrypt');
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const { application } = require('express');
-const cheakAuth =require('./../middleware/cheak-auth')
+const cheakAuth =require('./../middleware/cheak-auth');
 const registration = require('../models/user');
 
 router.post('/register', (req, res) => {
   bcrypt.hash(req.body.password, 10, (err, hash) => {
     if (err) {
-      return res.json({ status: false, message: "Hashing isssue" })
+      return res.json({ status: false, message: "Hashing issue" })
     } else {
       const user = new registration({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
+        gender: req.body.gender,
         password: hash,
       })
 
@@ -30,6 +31,7 @@ router.post('/register', (req, res) => {
     }
   })
 })
+
 //for login routing   
 router.post('/login', (req, res) => {
   registration.find({ email: req.body.email })
@@ -39,7 +41,7 @@ router.post('/login', (req, res) => {
         return res.json({ success: false, message: "user not found" })
       }
       const user = result[0];
-      console.log(result);
+      
       bcrypt.compare(req.body.password, user.password, (err, rest) => {
         const payload = {
           userId: user._id  
@@ -55,18 +57,37 @@ router.post('/login', (req, res) => {
       res.json({ success: false, message: "Auth Failed" })
     })
 })
+///verifying the token 
+
+const verifyToken = (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, 'webBatch');
+    req.userData=decoded;
+    next();
+  }
+  catch(ex){
+    console.log("Failed to verify in VerifyToken");
+    res.json({sucess:false,data:"Authentication Failed in verifytoken"})
+  }
+}
 
 
-router.get('/main',cheakAuth,(req, res) => {
+
+//main content routing 
+router.get('/main',verifyToken,(req, res) => {
+  console.log("main");
  const userId=req.userData.userId;
+ console.log(userId);
  registration.findById(userId)
  .exec()
  .then((result)=>{
-   res.json({sucess:true,data:result})
-
+  
+   res.json({success:true,data:result})
+   console.log(result)
  })
  .catch(err=>{
-  res.json({sucess:false,message:"Server Error"})
+  res.json({sucess:false,data:"Server Error"})
  })
 })
 
