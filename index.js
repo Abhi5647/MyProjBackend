@@ -25,5 +25,5 @@ app.use('',authRoute);
 app.listen(3000,async()=>{
     await mongoose.connect('mongodb+srv://myselfabhi56:123@cluster0.yowfxha.mongodb.net/MyProjectDb?retryWrites=true&w=majority')
     .then((res)=>console.log("connected"))
-    .catch((err)=>console.log("error connecting mongodb"))
+    .catch((err)=>console.log("error connecting mongodb"));
 })
