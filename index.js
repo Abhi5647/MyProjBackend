@@ -4,16 +4,8 @@ const app= express();
 const mongoose=require('mongoose');
 const authRoute=require('./routes/auth-route');
 const cors=require('cors')
-mongoose.connect('mongodb://localhost:27017/MyProjectDb',
-  (err)=>{
-    if(err){
-        console.log("Problem connecting Mongoose")
-    }else{
-        console.log(" connected to Mongoose")
-
-    }
-  }
-);
+var localconnection='mongodb://localhost:27017/MyProjectDb';
+  
 //parse application/x-www-form-urlencoded
 
 app.use(bodyParser.urlencoded({extended:false}));
@@ -30,6 +22,8 @@ app.get('/',(req,res)=>{
 app.use('',authRoute);
 
 
-app.listen(3000,()=>{
-    console.log('server is connected at 3000');
+app.listen(3000,async()=>{
+    await mongoose.connect('mongodb+srv://myselfabhi56:123@cluster0.yowfxha.mongodb.net/MyProjectDb?retryWrites=true&w=majority')
+    .then((res)=>console.log("connected"))
+    .catch((err)=>console.log("error connecting mongodb"))
 })
